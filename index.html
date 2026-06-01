@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Auto-Trend AI Agent - Full Automation</title>
+    <title>Auto-Trend AI Agent - مجاني 100%</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -54,6 +54,17 @@
             transform: scale(1.05);
             box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
         }
+
+        .badge {
+            display: inline-block;
+            background: #10b981;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-top: 8px;
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center p-4 md:p-8">
@@ -64,7 +75,8 @@
             <i class="fas fa-robot text-4xl text-white"></i>
         </div>
         <h1 class="text-5xl md:text-6xl font-bold text-white mb-2">🎬 Auto-Trend AI</h1>
-        <p class="text-white/80 text-xl">نظام توليد الفيديوهات الذكية 100% تلقائي</p>
+        <p class="text-white/80 text-xl">مجاني 100% - بدون مفاتيح!</p>
+        <div class="badge">✅ الصور + الفيديو مجاني</div>
     </div>
 
     <!-- Main Container -->
@@ -77,15 +89,9 @@
                 
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-300 mb-2">🔑 مفتاح OpenAI API</label>
-                        <input type="password" id="apiKeyInput" placeholder="sk_..." 
-                               class="w-full bg-white/10 border border-white/20 rounded-lg p-3 text-white placeholder-white/50 focus:ring-2 focus:ring-blue-400 focus:outline-none transition">
-                    </div>
-
-                    <div>
                         <label class="block text-sm font-medium text-gray-300 mb-2">📝 موضوع الفيديو</label>
                         <input type="text" id="topicInput" value="حقائق مرعبة عن الفضاء" 
-                               class="w-full bg-white/10 border border-white/20 rounded-lg p-3 text-white focus:ring-2 focus:ring-blue-400 focus:outline-none transition">
+                               class="w-full bg-white/10 border border-white/20 rounded-lg p-3 text-white placeholder-white/50 focus:ring-2 focus:ring-blue-400 focus:outline-none transition">
                     </div>
 
                     <div class="grid grid-cols-2 gap-3">
@@ -94,15 +100,14 @@
                             <select id="sceneCount" class="w-full bg-white/10 border border-white/20 rounded-lg p-2 text-white text-sm">
                                 <option value="3">3 مشاهد</option>
                                 <option value="5" selected>5 مشاهد</option>
-                                <option value="8">8 مشاهد</option>
                             </select>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-300 mb-2">🎨 النمط البصري</label>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">🎨 النمط</label>
                             <select id="visualStyle" class="w-full bg-white/10 border border-white/20 rounded-lg p-2 text-white text-sm">
                                 <option value="cinematic 8k">سينمائي</option>
                                 <option value="anime">أنمي</option>
-                                <option value="3d cartoon">3D كرتون</option>
+                                <option value="3d cartoon">3D</option>
                             </select>
                         </div>
                     </div>
@@ -110,12 +115,14 @@
                     <button onclick="runAgent()" id="runBtn" class="w-full btn-primary text-white font-bold py-4 px-4 rounded-xl shadow-lg flex justify-center items-center gap-2 text-lg">
                         <i class="fas fa-play"></i> تشغيل Agent
                     </button>
+                    
+                    <p class="text-xs text-white/60 text-center mt-4">⚡ المعالجة قد تستغرق 3 دقائق</p>
                 </div>
             </div>
 
             <!-- Logs -->
             <div class="glass-panel rounded-2xl p-4 h-80 flex flex-col">
-                <h3 class="text-sm font-bold text-gray-300 mb-2">📊 السجل</h3>
+                <h3 class="text-sm font-bold text-gray-300 mb-2">📋 السجل</h3>
                 <div id="logContainer" class="flex-1 overflow-y-auto text-xs font-mono space-y-1 text-green-400">
                     <div>[System] جاهز للعمل...</div>
                 </div>
@@ -152,16 +159,20 @@
                     </a>
                 </div>
             </div>
+
+            <!-- Scenes Grid -->
+            <div id="scenesGrid" class="grid grid-cols-2 md:grid-cols-4 gap-4 hidden">
+                <!-- Images will appear here -->
+            </div>
         </div>
     </div>
 
     <!-- Footer -->
     <div class="text-center text-white/60 text-sm">
-        <p>⚡ نظام ذكي لإنشاء الفيديوهات الفيروسية تلقائياً</p>
+        <p>⚡ نظام ذكي لإنشاء الفيديوهات الفيروسية - مجاني 100% بدون مفاتيح!</p>
     </div>
 
     <script>
-        let OPENAI_API_KEY = "";
         let isProcessing = false;
         const logContainer = document.getElementById('logContainer');
         const processingOverlay = document.getElementById('processingOverlay');
@@ -170,6 +181,7 @@
         const finalVideo = document.getElementById('finalVideo');
         const placeholderText = document.getElementById('placeholderText');
         const downloadSection = document.getElementById('downloadSection');
+        const scenesGrid = document.getElementById('scenesGrid');
         const runBtn = document.getElementById('runBtn');
 
         function addLog(msg) {
@@ -186,13 +198,6 @@
         }
 
         async function runAgent() {
-            OPENAI_API_KEY = document.getElementById('apiKeyInput').value.trim();
-            
-            if (!OPENAI_API_KEY || !OPENAI_API_KEY.startsWith('sk_')) {
-                alert('⚠️ أدخل مفتاح API صحيح يبدأ بـ sk_');
-                return;
-            }
-            
             if (isProcessing) return;
             isProcessing = true;
             runBtn.disabled = true;
@@ -201,55 +206,53 @@
             downloadSection.classList.add('hidden');
             finalVideo.classList.add('hidden');
             placeholderText.classList.remove('hidden');
+            scenesGrid.innerHTML = '';
+            scenesGrid.classList.add('hidden');
             logContainer.innerHTML = '';
             
             const topic = document.getElementById('topicInput').value;
             const count = parseInt(document.getElementById('sceneCount').value);
+            const style = document.getElementById('visualStyle').value;
 
             try {
-                updateProgress(20, '📝 كتابة السيناريو...');
-                addLog('🤖 بدء توليد السيناريو');
+                // Step 1: Create hardcoded script (مجاني بدون API)
+                updateProgress(15, '📝 إنشاء السيناريو...');
+                addLog('🤖 جاري إنشاء السيناريو');
                 
-                const scriptRes = await fetch('https://api.openai.com/v1/chat/completions', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${OPENAI_API_KEY}`
-                    },
-                    body: JSON.stringify({
-                        model: "gpt-3.5-turbo",
-                        messages: [{
-                            role: "user",
-                            content: `اكتب سيناريو فيديو قصير عن "${topic}" بـ ${count} جمل فقط. أضف وصف صورة لكل جملة. الرد بصيغة JSON: {"title":"...","sentences":[...],"prompts":[...]}`
-                        }],
-                        temperature: 0.8
-                    })
-                });
+                const script = {
+                    title: `فيديو عن ${topic}`,
+                    sentences: generateSentences(topic, count),
+                    prompts: generatePrompts(topic, count, style)
+                };
 
-                if (!scriptRes.ok) throw new Error('خطأ في API - تحقق من المفتاح');
+                addLog('✅ تم إنشاء السيناريو');
                 
-                const scriptData = await scriptRes.json();
-                let content = scriptData.choices[0].message.content;
-                content = content.replace(/```json/g, '').replace(/```/g, '').trim();
-                
-                const script = JSON.parse(content);
-                addLog('✅ تم توليد السيناريو');
-                
-                updateProgress(50, '🎨 توليد الصور...');
-                addLog('🎨 جاري رسم المشاهد بـ AI');
+                // Step 2: Generate Images (مجاني)
+                updateProgress(40, '🎨 رسم المشاهد...');
+                addLog('🎨 جاري توليد الصور');
                 
                 const images = [];
+                scenesGrid.classList.remove('hidden');
+                
                 for (let i = 0; i < count; i++) {
-                    const prompt = encodeURIComponent(script.prompts[i] || `scene about ${topic}`);
+                    const prompt = encodeURIComponent(`${script.prompts[i]}`);
                     const imgUrl = `https://image.pollinations.ai/prompt/${prompt}?width=512&height=512&nologo=true`;
+                    
+                    const card = document.createElement('div');
+                    card.className = 'aspect-square bg-slate-800 rounded-lg overflow-hidden relative shadow-md';
+                    card.innerHTML = `<img src="${imgUrl}" class="w-full h-full object-cover" onerror="this.src='https://via.placeholder.com/512?text=المشهد${i+1}'">`;;
+                    scenesGrid.appendChild(card);
+                    
                     images.push(imgUrl);
-                    updateProgress(50 + ((i+1)/count)*30, `🎨 المشهد ${i+1}/${count}`);
-                    await new Promise(r => setTimeout(r, 500));
+                    updateProgress(40 + ((i+1)/count)*35, `🎨 المشهد ${i+1}/${count}`);
+                    await new Promise(r => setTimeout(r, 800));
                 }
                 
                 addLog('✅ تم إنشاء جميع الصور');
-                updateProgress(90, '🎬 تجميع الفيديو...');
-                addLog('🎬 جاري تجميع الفيديو النهائي');
+                
+                // Step 3: Create Video
+                updateProgress(80, '🎬 تجميع الفيديو...');
+                addLog('🎬 جاري تجميع الفيديو');
                 
                 await createVideo(images, script.sentences);
                 
@@ -262,13 +265,36 @@
                 downloadSection.classList.remove('hidden');
                 
             } catch (error) {
+                console.error(error);
                 addLog('❌ خطأ: ' + error.message);
-                alert('خطأ: ' + error.message);
+                alert('❌ خطأ: ' + error.message);
                 processingOverlay.classList.add('hidden');
             } finally {
                 isProcessing = false;
                 runBtn.disabled = false;
             }
+        }
+
+        function generateSentences(topic, count) {
+            const sentences = [
+                `هذه حقيقة مذهلة عن ${topic}.`,
+                `لم تكن تعرف هذا السر حول ${topic}.`,
+                `${topic} أغرب مما تخيلت.`,
+                `اكتشف ما لا تعرفه عن ${topic}.`,
+                `هل تصدق هذا عن ${topic}؟`
+            ];
+            return sentences.slice(0, count);
+        }
+
+        function generatePrompts(topic, count, style) {
+            const prompts = [
+                `${topic}, ${style}, مذهل، تفاصيل عالية جداً 8k`,
+                `${topic}, سينمائي، واقعي، جودة عالية جداً`,
+                `${topic}, فن رقمي، ${style}, رائع، تفصيلي`,
+                `${topic}, مغامرة، مثير، جودة احترافية 8k`,
+                `${topic}, علمي، جميل جداً، ${style}`
+            ];
+            return prompts.slice(0, count);
         }
 
         async function createVideo(images, texts) {
@@ -289,7 +315,8 @@
                     const img = await loadImage(images[i]);
                     ctx.drawImage(img, 0, 0, 512, 512);
                     
-                    ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+                    // Add text overlay
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
                     ctx.fillRect(0, 420, 512, 92);
                     
                     ctx.font = 'bold 24px Tajawal';
@@ -297,9 +324,16 @@
                     ctx.textAlign = 'center';
                     wrapText(ctx, texts[i] || '', 256, 450, 480, 28);
                     
-                    await new Promise(r => setTimeout(r, 2000));
+                    await new Promise(r => setTimeout(r, 2500));
                 } catch (e) {
-                    console.error('Error loading image:', e);
+                    console.error('خطأ:', e);
+                    ctx.fillStyle = '#333';
+                    ctx.fillRect(0, 0, 512, 512);
+                    ctx.fillStyle = '#fff';
+                    ctx.font = 'bold 24px Tajawal';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(`المشهد ${i+1}`, 256, 256);
+                    await new Promise(r => setTimeout(r, 2500));
                 }
             }
             
@@ -321,7 +355,21 @@
                 const img = new Image();
                 img.crossOrigin = 'Anonymous';
                 img.onload = () => resolve(img);
-                img.onerror = reject;
+                img.onerror = () => {
+                    const fallbackCanvas = document.createElement('canvas');
+                    fallbackCanvas.width = 512;
+                    fallbackCanvas.height = 512;
+                    const fallbackCtx = fallbackCanvas.getContext('2d');
+                    fallbackCtx.fillStyle = '#2a2a2a';
+                    fallbackCtx.fillRect(0, 0, 512, 512);
+                    fallbackCtx.fillStyle = '#fff';
+                    fallbackCtx.font = 'bold 32px Tajawal';
+                    fallbackCtx.textAlign = 'center';
+                    fallbackCtx.fillText('المشهد', 256, 256);
+                    const fallbackImg = new Image();
+                    fallbackImg.src = fallbackCanvas.toDataURL();
+                    resolve(fallbackImg);
+                };
                 img.src = url;
             });
         }
