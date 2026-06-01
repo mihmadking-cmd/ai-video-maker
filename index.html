@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto-Trend AI Agent - Full Automation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap');
+        
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #e2e8f0;
+            min-height: 100vh;
+        }
+
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3b82f6;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .fade-in { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        video {
+            width: 100%;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4 md:p-8">
+
+    <!-- Header -->
+    <div class="text-center mb-10 animate-fadeIn">
+        <div class="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/20 backdrop-blur mb-4 shadow-xl">
+            <i class="fas fa-robot text-4xl text-white"></i>
+        </div>
+        <h1 class="text-5xl md:text-6xl font-bold text-white mb-2">🎬 Auto-Trend AI</h1>
+        <p class="text-white/80 text-xl">نظام توليد الفيديوهات الذكية 100% تلقائي</p>
+    </div>
+
+    <!-- Main Container -->
+    <div class="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
+        
+        <!-- Control Panel -->
+        <div class="lg:col-span-1 space-y-6">
+            <div class="glass-panel rounded-2xl p-6">
+                <h2 class="text-2xl font-bold text-white mb-6"><i class="fas fa-sliders-h ml-2"></i>الإعدادات</h2>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">🔑 مفتاح OpenAI API</label>
+                        <input type="password" id="apiKeyInput" placeholder="sk_..." 
+                               class="w-full bg-white/10 border border-white/20 rounded-lg p-3 text-white placeholder-white/50 focus:ring-2 focus:ring-blue-400 focus:outline-none transition">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-2">📝 موضوع الفيديو</label>
+                        <input type="text" id="topicInput" value="حقائق مرعبة عن الفضاء" 
+                               class="w-full bg-white/10 border border-white/20 rounded-lg p-3 text-white focus:ring-2 focus:ring-blue-400 focus:outline-none transition">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">🎞️ عدد المشاهد</label>
+                            <select id="sceneCount" class="w-full bg-white/10 border border-white/20 rounded-lg p-2 text-white text-sm">
+                                <option value="3">3 مشاهد</option>
+                                <option value="5" selected>5 مشاهد</option>
+                                <option value="8">8 مشاهد</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-300 mb-2">🎨 النمط البصري</label>
+                            <select id="visualStyle" class="w-full bg-white/10 border border-white/20 rounded-lg p-2 text-white text-sm">
+                                <option value="cinematic 8k">سينمائي</option>
+                                <option value="anime">أنمي</option>
+                                <option value="3d cartoon">3D كرتون</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button onclick="runAgent()" id="runBtn" class="w-full btn-primary text-white font-bold py-4 px-4 rounded-xl shadow-lg flex justify-center items-center gap-2 text-lg">
+                        <i class="fas fa-play"></i> تشغيل Agent
+                    </button>
+                </div>
+            </div>
+
+            <!-- Logs -->
+            <div class="glass-panel rounded-2xl p-4 h-80 flex flex-col">
+                <h3 class="text-sm font-bold text-gray-300 mb-2">📊 السجل</h3>
+                <div id="logContainer" class="flex-1 overflow-y-auto text-xs font-mono space-y-1 text-green-400">
+                    <div>[System] جاهز للعمل...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Video Display -->
+        <div class="lg:col-span-2 space-y-6">
+            <div class="glass-panel rounded-2xl p-4 min-h-96 flex items-center justify-center bg-black/50 relative overflow-hidden">
+                <div id="placeholderText" class="text-center text-white/60">
+                    <i class="fas fa-film text-6xl mb-4"></i>
+                    <p class="text-xl">سيظهر الفيديو هنا</p>
+                </div>
+                <video id="finalVideo" controls class="hidden w-full"></video>
+                
+                <div id="processingOverlay" class="absolute inset-0 bg-black/80 z-20 hidden flex flex-col items-center justify-center">
+                    <div class="loader w-12 h-12 border-t-blue-400 mb-4"></div>
+                    <p class="text-blue-300 font-bold text-center" id="processStatus">جاري المعالجة...</p>
+                    <div class="w-64 h-2 bg-gray-700 rounded-full mt-6 overflow-hidden">
+                        <div id="progressBar" class="h-full bg-blue-500 w-0 transition-all"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Download Section -->
+            <div id="downloadSection" class="glass-panel rounded-2xl p-6 hidden fade-in">
+                <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                    <div>
+                        <h3 class="text-xl font-bold text-white">✅ تم إنشاء الفيديو!</h3>
+                        <p class="text-sm text-gray-400">جاهز للتحميل والنشر</p>
+                    </div>
+                    <a id="downloadLink" href="#" download="ai-video.webm" class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-xl flex items-center gap-2 transition shadow-lg">
+                        <i class="fas fa-download"></i> تحميل الفيديو
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="text-center text-white/60 text-sm">
+        <p>⚡ نظام ذكي لإنشاء الفيديوهات الفيروسية تلقائياً</p>
+    </div>
+
+    <script>
+        let OPENAI_API_KEY = "";
+        let isProcessing = false;
+        const logContainer = document.getElementById('logContainer');
+        const processingOverlay = document.getElementById('processingOverlay');
+        const progressBar = document.getElementById('progressBar');
+        const processStatus = document.getElementById('processStatus');
+        const finalVideo = document.getElementById('finalVideo');
+        const placeholderText = document.getElementById('placeholderText');
+        const downloadSection = document.getElementById('downloadSection');
+        const runBtn = document.getElementById('runBtn');
+
+        function addLog(msg) {
+            const div = document.createElement('div');
+            const time = new Date().toLocaleTimeString('ar-SA').slice(0, 5);
+            div.innerHTML = `[${time}] ${msg}`;
+            logContainer.appendChild(div);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+
+        function updateProgress(percent, status) {
+            progressBar.style.width = percent + '%';
+            if(status) processStatus.innerText = status;
+        }
+
+        async function runAgent() {
+            OPENAI_API_KEY = document.getElementById('apiKeyInput').value.trim();
+            
+            if (!OPENAI_API_KEY || !OPENAI_API_KEY.startsWith('sk_')) {
+                alert('⚠️ أدخل مفتاح API صحيح يبدأ بـ sk_');
+                return;
+            }
+            
+            if (isProcessing) return;
+            isProcessing = true;
+            runBtn.disabled = true;
+            
+            processingOverlay.classList.remove('hidden');
+            downloadSection.classList.add('hidden');
+            finalVideo.classList.add('hidden');
+            placeholderText.classList.remove('hidden');
+            logContainer.innerHTML = '';
+            
+            const topic = document.getElementById('topicInput').value;
+            const count = parseInt(document.getElementById('sceneCount').value);
+
+            try {
+                updateProgress(20, '📝 كتابة السيناريو...');
+                addLog('🤖 بدء توليد السيناريو');
+                
+                const scriptRes = await fetch('https://api.openai.com/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${OPENAI_API_KEY}`
+                    },
+                    body: JSON.stringify({
+                        model: "gpt-3.5-turbo",
+                        messages: [{
+                            role: "user",
+                            content: `اكتب سيناريو فيديو قصير عن "${topic}" بـ ${count} جمل فقط. أضف وصف صورة لكل جملة. الرد بصيغة JSON: {"title":"...","sentences":[...],"prompts":[...]}`
+                        }],
+                        temperature: 0.8
+                    })
+                });
+
+                if (!scriptRes.ok) throw new Error('خطأ في API - تحقق من المفتاح');
+                
+                const scriptData = await scriptRes.json();
+                let content = scriptData.choices[0].message.content;
+                content = content.replace(/```json/g, '').replace(/```/g, '').trim();
+                
+                const script = JSON.parse(content);
+                addLog('✅ تم توليد السيناريو');
+                
+                updateProgress(50, '🎨 توليد الصور...');
+                addLog('🎨 جاري رسم المشاهد بـ AI');
+                
+                const images = [];
+                for (let i = 0; i < count; i++) {
+                    const prompt = encodeURIComponent(script.prompts[i] || `scene about ${topic}`);
+                    const imgUrl = `https://image.pollinations.ai/prompt/${prompt}?width=512&height=512&nologo=true`;
+                    images.push(imgUrl);
+                    updateProgress(50 + ((i+1)/count)*30, `🎨 المشهد ${i+1}/${count}`);
+                    await new Promise(r => setTimeout(r, 500));
+                }
+                
+                addLog('✅ تم إنشاء جميع الصور');
+                updateProgress(90, '🎬 تجميع الفيديو...');
+                addLog('🎬 جاري تجميع الفيديو النهائي');
+                
+                await createVideo(images, script.sentences);
+                
+                updateProgress(100, '✅ اكتمل!');
+                addLog('🎉 تم إنشاء الفيديو بنجاح!');
+                
+                processingOverlay.classList.add('hidden');
+                placeholderText.classList.add('hidden');
+                finalVideo.classList.remove('hidden');
+                downloadSection.classList.remove('hidden');
+                
+            } catch (error) {
+                addLog('❌ خطأ: ' + error.message);
+                alert('خطأ: ' + error.message);
+                processingOverlay.classList.add('hidden');
+            } finally {
+                isProcessing = false;
+                runBtn.disabled = false;
+            }
+        }
+
+        async function createVideo(images, texts) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 512;
+            canvas.height = 512;
+            const ctx = canvas.getContext('2d');
+            
+            const stream = canvas.captureStream(30);
+            const mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+            const chunks = [];
+            
+            mediaRecorder.ondataavailable = e => chunks.push(e.data);
+            mediaRecorder.start();
+
+            for (let i = 0; i < images.length; i++) {
+                try {
+                    const img = await loadImage(images[i]);
+                    ctx.drawImage(img, 0, 0, 512, 512);
+                    
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+                    ctx.fillRect(0, 420, 512, 92);
+                    
+                    ctx.font = 'bold 24px Tajawal';
+                    ctx.fillStyle = '#fff';
+                    ctx.textAlign = 'center';
+                    wrapText(ctx, texts[i] || '', 256, 450, 480, 28);
+                    
+                    await new Promise(r => setTimeout(r, 2000));
+                } catch (e) {
+                    console.error('Error loading image:', e);
+                }
+            }
+            
+            mediaRecorder.stop();
+            
+            return new Promise(resolve => {
+                mediaRecorder.onstop = () => {
+                    const blob = new Blob(chunks, { type: 'video/webm' });
+                    const url = URL.createObjectURL(blob);
+                    finalVideo.src = url;
+                    document.getElementById('downloadLink').href = url;
+                    resolve();
+                };
+            });
+        }
+
+        function loadImage(url) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.crossOrigin = 'Anonymous';
+                img.onload = () => resolve(img);
+                img.onerror = reject;
+                img.src = url;
+            });
+        }
+
+        function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+            const words = text.split(' ');
+            let line = '';
+            for(let word of words) {
+                const testLine = line + word + ' ';
+                if (ctx.measureText(testLine).width > maxWidth) {
+                    ctx.fillText(line, x, y);
+                    line = word + ' ';
+                    y += lineHeight;
+                } else {
+                    line = testLine;
+                }
+            }
+            ctx.fillText(line, x, y);
+        }
+    </script>
+</body>
+</html>
